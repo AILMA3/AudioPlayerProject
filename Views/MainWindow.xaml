@@ -21,6 +21,7 @@
                         <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
                         <TextBlock Text="{Binding Author}" Foreground="Gray"/>
                         <TextBlock Text="{Binding FileName}" FontSize="10" Foreground="DarkGray"/>
+                        <TextBlock Text="{Binding Duration, StringFormat='{}{0:mm\\:ss}'}" FontWeight="Bold"/>
                         <Button Content="Удалить" 
                                 Command="{Binding DataContext.DeleteTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
