@@ -1,36 +1,89 @@
 ﻿<Window x:Class="AudioPlayerProject.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Music Player" Height="450" Width="800">
+        Title="Music Player" Height="600" Width="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <TabControl>
+            <!--Первая вкладка - Плеер-->
+            <TabItem Header="Плеер">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-            <Button Content="Добавить треки" Command="{Binding AddTrackCommand}" Margin="0,0,10,0"/>
-            <TextBlock Text="Музыкальная библиотека" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
-        </StackPanel>
+                    <!--Визуализатор (заглушка)-->
+                    <Border Grid.Row="0" Background="#1a1a1a" Margin="10">
+                        <TextBlock Text="Визуализатор будет здесь" 
+                                   Foreground="White" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"
+                                   FontSize="16"/>
+                    </Border>
 
-        <ListBox Grid.Row="1" ItemsSource="{Binding AudioTracks}" Margin="10">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical" Margin="5">
-                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding Author}" Foreground="Gray"/>
-                        <TextBlock Text="{Binding FileName}" FontSize="10" Foreground="DarkGray"/>
-                        <TextBlock Text="{Binding Duration, StringFormat='{}{0:mm\\:ss}'}" FontWeight="Bold"/>
-                        <Button Content="Удалить" 
-                                Command="{Binding DataContext.DeleteTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                CommandParameter="{Binding}"
-                                Width="60" Margin="0,5,0,0"/>
+                    <!-- Информация о текущем треке -->
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Margin="10,5">
+                        <TextBlock Text="{Binding CurrentTrack.Title}" 
+                                   FontWeight="Bold" 
+                                   FontSize="14"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentTrack.Author}" 
+                                   Foreground="Gray"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentTime}" 
+                                   HorizontalAlignment="Center"
+                                   Margin="0,5"/>
                     </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
 
-        <TextBlock Grid.Row="2" Text="{Binding StatusMessage}" Margin="10" Foreground="Blue"/>
+                    <!-- Кнопки управления -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                        <Button Content="⏮" 
+                                Command="{Binding PreviousCommand}" 
+                                Width="40" Height="40" FontSize="16" Margin="5"/>
+                        <Button Content="{Binding PlayPauseText}" 
+                                Command="{Binding PlayPauseCommand}" 
+                                Width="60" Height="40" FontSize="14" Margin="5"/>
+                        <Button Content="⏭" 
+                                Command="{Binding NextCommand}" 
+                                Width="40" Height="40" FontSize="16" Margin="5"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Библиотека">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+                        <Button Content="Добавить треки" Command="{Binding AddTrackCommand}" Margin="0,0,10,0"/>
+                        <TextBlock Text="Музыкальная библиотека" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <ListBox Grid.Row="1" ItemsSource="{Binding AudioTracks}" Margin="10">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" Margin="5">
+                                    <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Author}" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding FileName}" FontSize="10" Foreground="DarkGray"/>
+                                    <TextBlock Text="{Binding Duration, StringFormat='{}{0:mm\\:ss}'}" FontWeight="Bold"/>
+                                    <Button Content="Удалить" 
+                            Command="{Binding DataContext.DeleteTrackCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                            CommandParameter="{Binding}"
+                            Width="60" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock Grid.Row="2" Text="{Binding StatusMessage}" Margin="10" Foreground="Blue"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
