@@ -9,9 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
     <Folder Include="Converters\" />
-    <Folder Include="Audio\" />
     <Folder Include="Playlists\" />
   </ItemGroup>
 
