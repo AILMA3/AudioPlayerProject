@@ -1,4 +1,6 @@
 ﻿using AudioPlayerProject.Services;
+using AudioVisualizer.WinForm;
+using AudioVisualizer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,8 +24,14 @@ namespace AudioPlayerProject
         private AudioTrack _currentTrack;
         private Visibility _volumeVisibility = Visibility.Collapsed;
         private double _volume = 0.5;
+        private TimeSpan _currentPlaybackPosition = TimeSpan.Zero;
+        private TimeSpan _sliderPosition = TimeSpan.Zero;
+        private TimeSpan _totalDuration = TimeSpan.Zero;
+        private bool _isSeeking = false;
 
         public ObservableCollection<AudioTrack> AudioTracks { get; } = new ObservableCollection<AudioTrack>();
+
+        public AudioPlayerService AudioPlayer => _audioPlayer;
 
         public AudioTrack CurrentTrack
         {
@@ -93,6 +101,31 @@ namespace AudioPlayerProject
             }
         }
 
+        public TimeSpan CurrentPosition
+        {
+            get => _sliderPosition;
+            set
+            {
+                _sliderPosition = value;
+                OnPropertyChanged(nameof(CurrentPosition));
+                UpdateTimeDisplay();
+            }
+        }
+
+        public TimeSpan TotalDuration
+        {
+            get => _totalDuration;
+            set
+            {
+                if (_totalDuration != value)
+                {
+                    _totalDuration = value;
+                    OnPropertyChanged(nameof(TotalDuration));
+                    UpdateTimeDisplay();
+                }
+            }
+        }
+
         public string VolumePercent => $"{(_volume * 100):F0}%";
 
         public ICommand AddTrackCommand { get; }
@@ -111,6 +144,7 @@ namespace AudioPlayerProject
             _audioPlayer.PlaybackStarted += OnPlaybackStarted;
             _audioPlayer.PlaybackPaused += OnPlaybackPaused;
             _audioPlayer.PositionChanged += OnPositionChanged;
+            _audioPlayer.DurationChanged += OnDurationChanged;
 
             AddTrackCommand = new RelayCommand(async (param) => await AddTrackAsync());
             DeleteTrackCommand = new RelayCommand(async (param) => await DeleteTrackAsync(param as AudioTrack));
@@ -126,6 +160,7 @@ namespace AudioPlayerProject
         {
             VolumeVisibility = VolumeVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
+
 
         private async Task LoadAudioTracksAsync()
         {
@@ -247,9 +282,27 @@ namespace AudioPlayerProject
             _audioPlayer.PlayPrevious();
         }
 
+        public void StartSeeking()
+        {
+            _isSeeking = true;
+        }
+
+        public void EndSeeking()
+        {
+            _isSeeking = false;
+            _audioPlayer.SetPosition(_sliderPosition);
+        }
+
         private void OnTrackChanged(AudioTrack track)
         {
             CurrentTrack = track;
+            _currentPlaybackPosition = TimeSpan.Zero;
+            _sliderPosition = TimeSpan.Zero;
+            _totalDuration = TimeSpan.Zero;
+            _isSeeking = false;
+            OnPropertyChanged(nameof(CurrentPosition));
+            OnPropertyChanged(nameof(TotalDuration));
+            UpdateTimeDisplay();
         }
 
         private void OnPlaybackStarted()
@@ -262,10 +315,29 @@ namespace AudioPlayerProject
             PlayPauseText = "▶";
         }
 
+        private void UpdateTimeDisplay()
+        {
+            var displayPosition = _isSeeking ? _sliderPosition : _currentPlaybackPosition;
+            CurrentTime = $"{displayPosition:mm\\:ss} / {_totalDuration:mm\\:ss}";
+        }
+
         private void OnPositionChanged(TimeSpan position)
         {
-            // Обновляем отображение времени
-            CurrentTime = $"{position:mm\\:ss} / {_audioPlayer.GetTotalDuration():mm\\:ss}";
+            _currentPlaybackPosition = position;
+
+            if (!_isSeeking)
+            {
+                _sliderPosition = position;
+                OnPropertyChanged(nameof(CurrentPosition));
+            }
+
+            UpdateTimeDisplay();
+        }
+
+        private void OnDurationChanged(TimeSpan duration)
+        {
+            TotalDuration = duration;
+            UpdateTimeDisplay();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

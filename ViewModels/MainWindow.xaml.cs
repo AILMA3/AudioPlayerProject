@@ -21,4 +21,21 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = new MainViewModel();
     }
+
+    private void Slider_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.StartSeeking();
+        }
+    }
+
+    private void Slider_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.EndSeeking();
+        }
+    }
 }
+

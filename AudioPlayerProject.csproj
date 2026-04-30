@@ -9,10 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Converters\" />
     <Folder Include="Playlists\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="StarFlare.AudioVisualizer.Core" Version="1.0.99" />
+    <PackageReference Include="StarFlare.AudioVisualizer.WinForm" Version="1.0.99" />
+    <PackageReference Include="StarFlare.AudioVisualizer.WPF" Version="1.0.99" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 

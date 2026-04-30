@@ -8,7 +8,7 @@ using System.Windows.Threading;
 
 namespace AudioPlayerProject.Services
 {
-    internal class AudioPlayerService
+    public class AudioPlayerService
     {
         private readonly MediaPlayer _mediaPlayer;
         private readonly DispatcherTimer _positionTimer;
@@ -25,6 +25,11 @@ namespace AudioPlayerProject.Services
         public event Action PlaybackPaused;
         public event Action PlaybackStopped;
         public event Action<TimeSpan> PositionChanged;
+        public event Action<TimeSpan> DurationChanged;
+
+        public MediaPlayer MediaPlayer => _mediaPlayer;
+        public bool HasAudio => _mediaPlayer.HasAudio;
+        public double Volume => _mediaPlayer.Volume;
 
         public AudioPlayerService()
         {
@@ -41,6 +46,12 @@ namespace AudioPlayerProject.Services
         {
             _playlist = playlist;
             _currentTrackIndex = -1;
+        }
+
+        public void SetPosition(TimeSpan position)
+        {
+            _mediaPlayer.Position = position;
+            PositionChanged?.Invoke(position);
         }
 
         public void SetVolume(double volume)
@@ -134,6 +145,8 @@ namespace AudioPlayerProject.Services
         private void OnMediaOpened(object sender, EventArgs e)
         {
             // Можно добавить логику при открытии медиа
+            var duration = _mediaPlayer.NaturalDuration.HasTimeSpan ? _mediaPlayer.NaturalDuration.TimeSpan : TimeSpan.Zero;
+            DurationChanged?.Invoke(duration);
             PositionChanged?.Invoke(TimeSpan.Zero);
         }
 
@@ -147,7 +160,7 @@ namespace AudioPlayerProject.Services
 
         private void OnPositionTimerTick(object sender, EventArgs e)
         {
-            PositionChanged?.Invoke(_mediaPlayer.Position);
+             PositionChanged?.Invoke(_mediaPlayer.Position);
         }
 
         public TimeSpan GetCurrentPosition()
